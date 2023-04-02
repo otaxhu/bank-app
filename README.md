@@ -1,2 +1,2 @@
 # bank-app
-Proyecto de banca digital que permite a los usuarios realizar transacciones financieras entre sí.
+Este es proyecto de banca digital que permitira a usuarios realizar transacciones financieras entre sí. Se implementará utilizando el lenguaje de programación Go y se seguirá una arquitectura hexagonal para separar la lógica de negocios de la infraestructura. Se utilizarán interfaces para garantizar la flexibilidad y escalabilidad del sistema. Los usuarios podrán registrarse, iniciar sesión, agregar y retirar fondos, transferir dinero a otros usuarios y ver sus transacciones. Además, se implementará seguridad en el proyecto, incluyendo autenticación y autorización de usuarios y protección de datos sensibles.
