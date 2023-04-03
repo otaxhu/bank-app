@@ -11,7 +11,7 @@ import (
 
 func NewMysqlConnection(ctx context.Context, cfg *configs.Configs) (*sqlx.DB, error) {
 	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s:%d)/%s?ParseTime=true",
+		"%s:%s@tcp(%s:%d)/%s?parseTime=true",
 		cfg.MysqlConfig.Username,
 		cfg.MysqlConfig.Password,
 		cfg.MysqlConfig.Host,
