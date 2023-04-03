@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	errUserAlreadyRegistered = errors.New("user already registered")
+	ErrUserAlreadyRegistered = errors.New("user already registered")
 )
 
 type UsersService interface {
@@ -28,8 +28,8 @@ func NewUsersService(userRepo repository.UsersRepository) UsersService {
 
 func (us *usersService) RegisterUser(ctx context.Context, user *entity.UserCredentials) error {
 	u, _ := us.userRepo.GetUserByEmail(ctx, user.Email)
-	if u.Email == user.Email {
-		return errUserAlreadyRegistered
+	if u != nil {
+		return ErrUserAlreadyRegistered
 	}
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
