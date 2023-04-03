@@ -10,7 +10,7 @@ import (
 var configsFile []byte
 
 type Configs struct {
-	Port        int            `yaml:"port"`
+	Port        string         `yaml:"port"`
 	MysqlConfig databaseConfig `yaml:"mysql_config"`
 }
 
