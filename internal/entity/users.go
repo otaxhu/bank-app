@@ -1,5 +1,7 @@
 package entity
 
+import "github.com/golang-jwt/jwt/v4"
+
 // Esto representa el user que debe devolver cualquier implementacion de UsersRepository
 type RepositoryUser struct {
 	Id       string
@@ -32,4 +34,10 @@ type UserCredentials struct {
 type DomainUser struct {
 	Id    string
 	Roles []string
+}
+
+// Representa a los claims de JWT del usuario
+type UserClaims struct {
+	User *DomainUser
+	jwt.StandardClaims
 }
