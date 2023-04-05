@@ -4,14 +4,16 @@ import (
 	"context"
 	"errors"
 
+	"github.com/otaxhu/bank-app/configs"
 	"github.com/otaxhu/bank-app/internal/entity"
 	"github.com/otaxhu/bank-app/internal/repository"
-	"golang.org/x/crypto/bcrypt"
+	"github.com/otaxhu/bank-app/internal/utils/encryption"
 )
 
 var (
 	ErrUserAlreadyRegistered = errors.New("user already registered")
 	ErrPasswordTooLong       = errors.New("the password is too long")
+	ErrInvalidCredentials    = errors.New("the email or the password are incorrect")
 )
 
 type UsersService interface {
@@ -20,11 +22,15 @@ type UsersService interface {
 }
 
 type usersService struct {
-	userRepo repository.UsersRepository
+	userRepo        repository.UsersRepository
+	encryptionUtils *encryption.EncryptionUtils
 }
 
-func NewUsersService(userRepo repository.UsersRepository) UsersService {
-	return &usersService{userRepo: userRepo}
+func NewUsersService(cfg *configs.Configs, userRepo repository.UsersRepository) UsersService {
+	return &usersService{
+		userRepo:        userRepo,
+		encryptionUtils: encryption.NewEncryptionUtils(cfg),
+	}
 }
 
 func (us *usersService) RegisterUser(ctx context.Context, user *entity.UserCredentials) error {
@@ -33,15 +39,15 @@ func (us *usersService) RegisterUser(ctx context.Context, user *entity.UserCrede
 		return ErrUserAlreadyRegistered
 	}
 
-	hash, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+	hash, err := us.encryptionUtils.GenerateHashFromPassword(user.Password)
 	if err != nil {
-		if err == bcrypt.ErrPasswordTooLong {
+		if err == encryption.ErrPasswordTooLong {
 			return ErrPasswordTooLong
 		}
 		return err
 	}
 
-	user.Password = string(hash)
+	user.Password = hash
 
 	if err := us.userRepo.SaveUser(ctx, user); err != nil {
 		return err
@@ -57,10 +63,19 @@ func (us *usersService) RegisterUser(ctx context.Context, user *entity.UserCrede
 func (us *usersService) LoginUser(ctx context.Context, user *entity.UserCredentials) (*entity.DomainUser, error) {
 	repoUser, err := us.userRepo.GetUserByEmail(ctx, user.Email)
 	if err != nil {
+		if err == repository.ErrResourceNotFound {
+			return nil, ErrInvalidCredentials
+		}
 		return nil, err
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(repoUser.Password), []byte(user.Password)); err != nil {
+	if err := us.encryptionUtils.CompareHashAndPassword(repoUser.Password, user.Password); err != nil {
+		if err == encryption.ErrPasswordTooLong {
+			return nil, ErrPasswordTooLong
+		}
+		if err == encryption.ErrMismatchedHashAndPassword {
+			return nil, ErrInvalidCredentials
+		}
 		return nil, err
 	}
 
