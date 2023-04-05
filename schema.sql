@@ -8,3 +8,10 @@ CREATE TABLE users (
     PRIMARY KEY (id),
     UNIQUE (email)
 );
+CREATE TABLE user_roles (
+    id VARCHAR(255) NOT NULL,
+    role VARCHAR(255) NOT NULL,
+    user_id VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
