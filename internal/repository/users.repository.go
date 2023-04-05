@@ -9,7 +9,11 @@ import (
 
 type UsersRepository interface {
 	SaveUser(ctx context.Context, user *entity.UserCredentials) error
-	GetUserByEmail(ctx context.Context, email string) (*entity.DomainUser, error)
+	GetUserByEmail(ctx context.Context, email string) (*entity.RepositoryUser, error)
+	GetUserById(ctx context.Context, userId string) (*entity.RepositoryUser, error)
+	DeleteUser(ctx context.Context, userId string) error
+	UpdateUser(ctx context.Context, user *entity.RepositoryUser) error
+	SaveUserRole(ctx context.Context, userId, role string) error
 }
 
 type mysqlUsersRepo struct {
