@@ -21,16 +21,23 @@ type responseMessage struct {
 
 func (eh *echoHandlers) RegisterUser(c echo.Context) error {
 	ctx := c.Request().Context()
-	cred := &dto.RegisterUser{}
-	if err := c.Bind(cred); err != nil {
+	dto := &dto.RegisterUser{}
+	if err := c.Bind(dto); err != nil {
 		return c.JSON(http.StatusBadRequest, &responseMessage{Message: "Invalid Request"})
 	}
-	if err := eh.usersServ.RegisterUser(ctx, &entity.UserCredentials{
-		Email:    cred.Email,
-		Password: cred.Password,
-	}); err != nil {
+	if err := eh.dataValidator.StructCtx(ctx, dto); err != nil {
+		return c.JSON(http.StatusBadRequest, &responseMessage{Message: err.Error()})
+	}
+	cred := &entity.UserCredentials{
+		Email:    dto.Email,
+		Password: dto.Password,
+	}
+	if err := eh.usersServ.RegisterUser(ctx, cred); err != nil {
 		if err == service.ErrUserAlreadyRegistered {
 			return c.JSON(http.StatusConflict, &responseMessage{Message: err.Error()})
+		}
+		if err == service.ErrPasswordTooLong {
+			return c.JSON(http.StatusBadRequest, &responseMessage{Message: err.Error()})
 		}
 		return c.JSON(http.StatusInternalServerError, &responseMessage{Message: err.Error()})
 	}
