@@ -27,6 +27,15 @@ func main() {
 			func(apiecho *apiecho.ApiEcho, e *echo.Echo) {
 				go apiecho.Start(e)
 			},
+			//func(ctx context.Context, us service.UsersService) {
+			//	userCredentials := &entity.UserCredentials{Email: "aaabbb", Password: "12345"}
+			//	anotherUser, err := us.LoginUser(ctx, userCredentials)
+			//	if err != nil {
+			//		log.Println(err)
+			//		return
+			//	}
+			//	log.Println(anotherUser)
+			//},
 		),
 	)
 	app.Run()
