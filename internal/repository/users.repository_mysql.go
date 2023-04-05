@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 
 	"github.com/google/uuid"
@@ -19,7 +20,8 @@ const (
 )
 
 var (
-	errNoRowsAffected = errors.New("no rows affected in the query sql")
+	errNoRowsAffected   = errors.New("no rows affected in the query sql")
+	ErrResourceNotFound = errors.New("resource not found")
 )
 
 func (murepo *mysqlUsersRepo) SaveUser(ctx context.Context, user *entity.UserCredentials) error {
@@ -37,6 +39,9 @@ func (murepo *mysqlUsersRepo) SaveUser(ctx context.Context, user *entity.UserCre
 func (murepo *mysqlUsersRepo) GetUserByEmail(ctx context.Context, email string) (*entity.RepositoryUser, error) {
 	mysqlUser := &entity.MysqlEntityUser{}
 	if err := murepo.db.GetContext(ctx, mysqlUser, qryGetUserByEmail, email); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, ErrResourceNotFound
+		}
 		return nil, err
 	}
 	mysqlUserRoles := []entity.MysqlEntityUserRole{}
@@ -57,6 +62,9 @@ func (murepo *mysqlUsersRepo) GetUserByEmail(ctx context.Context, email string) 
 func (murepo *mysqlUsersRepo) GetUserById(ctx context.Context, userId string) (*entity.RepositoryUser, error) {
 	mysqlUser := &entity.MysqlEntityUser{}
 	if err := murepo.db.GetContext(ctx, mysqlUser, qryGetUserById, userId); err != nil {
+		if err == sql.ErrNoRows {
+			return nil, ErrResourceNotFound
+		}
 		return nil, err
 	}
 	mysqlUserRoles := []entity.MysqlEntityUserRole{}
