@@ -5,6 +5,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/otaxhu/bank-app/configs"
 	"github.com/otaxhu/bank-app/internal/service"
+	"github.com/otaxhu/bank-app/internal/utils/encryption"
 )
 
 type ApiEcho struct {
@@ -16,8 +17,9 @@ func NewApiEcho(cfg *configs.Configs, us service.UsersService) *ApiEcho {
 	return &ApiEcho{
 		port: cfg.Port,
 		handlers: &echoHandlers{
-			usersServ:     us,
-			dataValidator: validator.New(),
+			usersServ:       us,
+			dataValidator:   validator.New(),
+			encryptionUtils: encryption.NewEncryptionUtils(cfg),
 		}}
 }
 
