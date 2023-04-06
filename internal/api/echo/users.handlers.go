@@ -56,6 +56,9 @@ func (eh *echoHandlers) LoginUser(c echo.Context) error {
 	if err := c.Bind(params); err != nil {
 		return c.JSON(http.StatusBadRequest, newResponseJSON("Invalid Request"))
 	}
+	if err := eh.dataValidator.StructCtx(ctx, params); err != nil {
+		return c.JSON(http.StatusBadRequest, newResponseJSON(err.Error()))
+	}
 	cred := &entity.UserCredentials{
 		Email:    params.Email,
 		Password: params.Password,
@@ -74,5 +77,13 @@ func (eh *echoHandlers) LoginUser(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusUnauthorized, newResponseJSON(err.Error()))
 	}
-	return c.JSON(http.StatusOK, tokenString)
+	cookie := &http.Cookie{
+		Name:     "Authorization",
+		Value:    tokenString,
+		Secure:   true,
+		HttpOnly: true,
+		SameSite: http.SameSiteNoneMode,
+	}
+	c.SetCookie(cookie)
+	return c.NoContent(http.StatusOK)
 }
