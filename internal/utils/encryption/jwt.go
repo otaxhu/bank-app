@@ -6,6 +6,9 @@ import (
 )
 
 func (e *EncryptionUtils) NewUserJWT(user *entity.DomainUser) (string, error) {
-	claims := &entity.UserClaims{User: user}
-	return jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString(e.configs.JWTSecret)
+	claims := &entity.UserClaims{
+		Id:    user.Id,
+		Roles: user.Roles,
+	}
+	return jwt.NewWithClaims(jwt.SigningMethodHS256, claims).SignedString([]byte(e.configs.JWTSecret))
 }

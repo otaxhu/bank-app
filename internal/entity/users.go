@@ -38,6 +38,7 @@ type DomainUser struct {
 
 // Representa a los claims de JWT del usuario
 type UserClaims struct {
-	User *DomainUser
+	Id    string   `json:"id"`
+	Roles []string `json:"roles"`
 	jwt.StandardClaims
 }
