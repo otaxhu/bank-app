@@ -12,7 +12,7 @@ var configsFile []byte
 type Configs struct {
 	Port        string         `yaml:"port"`
 	MysqlConfig databaseConfig `yaml:"mysql_config"`
-	JWTSecret   []byte         `yaml:"jwt_secret"`
+	JWTSecret   string         `yaml:"jwt_secret"`
 }
 
 type databaseConfig struct {
