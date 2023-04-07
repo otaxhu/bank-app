@@ -15,3 +15,11 @@ CREATE TABLE user_roles (
     PRIMARY KEY (id),
     FOREIGN KEY (user_id) REFERENCES users (id)
 );
+CREATE TABLE bank_accounts (
+    id VARCHAR(255) NOT NULL,
+    user_id VARCHAR(255) NOT NULL,
+    balance DECIMAL(10,2) DEFAULT 0,
+    currency VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id),
+    FOREIGN KEY (user_id) REFERENCES users (id)
+);
